@@ -1,0 +1,206 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Résultats par Table</title>
+  <style>
+   body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 0px;
+}
+footer {
+    background-color: transparent;
+    color: #bbb;
+    text-align: center;
+    padding: 5px;
+    font-weight: light;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+}
+
+#rawData {
+    margin: 10px auto;
+    display: block;
+    width: 70%;
+    padding: 10px;
+    border: 2px solid #3498db;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+}
+
+button {
+    margin: 10px auto; /* Centrer le bouton horizontalement */
+    display: block;
+    padding: 10px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 80%; /* Ajustement de la largeur du tableau */
+    margin: 20px auto; /* Centrer le tableau horizontalement */
+}
+
+th, td {
+    border: 1px solid #dddddd;
+    text-align: center;
+    padding: 8px;
+}
+
+#menuButton {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 10px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    z-index: 1; /* Assurez-vous que le bouton de menu est au-dessus du contenu */
+}
+button {
+    margin: 10px auto; /* Centrer le bouton horizontalement */
+    display: block;
+    padding: 10px;
+    background-color: #3498db;
+    color: #fff;
+    border: 2px solid #3498db; /* Ajouter une bordure */
+    border-radius: 5px; /* Ajouter des coins arrondis */
+    cursor: pointer;
+    font-size: 16px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2); /* Ajouter une ombre */
+    box-sizing: border-box; /* Inclure la bordure et le rembourrage dans la largeur totale */
+     /* Ajouter une transition pour le changement de couleur */
+}
+
+button:hover {
+background-color: #ff6600 !important;
+}
+#menuButton {
+    margin: 10px auto;
+    display: block;
+    padding: 10px;
+    background-color: #3498db;
+    color: #fff;
+    border: 2px solid #3498db;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+}
+
+#menuButton:hover {
+    background-color: #e67e22;
+}
+  </style>
+</head>
+<body>
+  <h1>Results per Table</h1>
+<i>On Eventlink, click on the wheel at the bottom left, select "print players list", copy the whole page, then paste everything here.</i>
+<br><br>
+  <textarea id="rawData" rows="10" cols="50" placeholder="Paste the raw data here..."></textarea><br>
+  <button onclick="executerCode()">Execute code</button>
+<button id="menuButton" class="menuButton" onclick="goToMenu()">Menu</button>
+
+  <table id="resultTable">
+    <tr>
+      <th>Table</th>
+      <th>Player 1</th>
+      <th>Player 2</th>
+    </tr>
+  </table>
+
+  <script>
+function goToMenu() {
+            window.location.href = "menu.html";
+        }
+
+        document.getElementById('menuButton').addEventListener('click', goToMenu);
+    function executerCode() {
+      var rawData = document.getElementById("rawData").value;
+      var resultData = regrouperParTable(rawData);
+      majResultats(resultData);
+    }
+
+    function regrouperParTable(rawData) {
+      var lines = rawData.split('\n');
+      var tables = {};
+
+      var inPlayerSection = false;
+
+      for (var i = 0; i < lines.length; i++) {
+        var line = lines[i].trim();
+
+        if (line === '' || line.startsWith('EventLink') || line.startsWith('Joueur')) {
+          inPlayerSection = false;
+          continue; // Ignorer les lignes vides, l'en-tête et le pied de page
+        }
+
+        if (line.startsWith('-')) {
+          inPlayerSection = true;
+          continue; // Ignorer la ligne de séparation
+        }
+
+        if (inPlayerSection) {
+          var parts = line.split(/\s+/);
+          if (parts.length < 2) continue;
+
+          var player = parts.slice(0, -1).join(' ');
+          var table = parts[parts.length - 1];
+
+          if (!tables[table]) {
+            tables[table] = [];
+          }
+
+          tables[table].push(player);
+        }
+      }
+
+      var tableResults = [['Table', 'Player 1', 'Player 2']];
+
+      for (var table in tables) {
+        var players = tables[table];
+        tableResults.push([table].concat(players.slice(0, 2))); // Ajouter jusqu'à deux joueurs
+      }
+
+      return tableResults;
+    }
+
+    function majResultats(resultData) {
+      var table = document.getElementById("resultTable");
+      table.innerHTML = ""; // Effacer le contenu actuel du tableau
+      for (var i = 0; i < resultData.length; i++) {
+        var row = table.insertRow(-1);
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        var cell3 = row.insertCell(2);
+        cell1.innerHTML = resultData[i][0];
+        cell2.innerHTML = resultData[i][1] || '';
+        cell3.innerHTML = resultData[i][2] || '';
+      }
+
+      // Mettre à jour la zone de texte avec les résultats
+      var resultText = resultData.map(row => row.join('\t')).join('\n');
+      document.getElementById("rawData").value = resultText;
+
+      // Sélectionner le texte dans la zone de texte
+      document.getElementById("rawData").select();
+    }
+  </script>
+<footer>
+        All rights reserved. Site web by <a href="mailto:info@timevaulttcg.com">Jordane Lacombe</a>
+    </footer>
+</body>
+
+</html>

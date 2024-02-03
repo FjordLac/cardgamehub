@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tableau de Bord des Résultats</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0px;
+    }
+    footer {
+      background-color: transparent;
+      color: #bbb;
+      text-align: center;
+      padding: 5px;
+      font-weight: light;
+      width: 100%;
+      position: fixed;
+      bottom: 0;
+    }
+    #playerList, #deckList {
+      margin: 10px;
+      display: inline-block;
+      width: 40%;
+      padding: 10px;
+      border: 2px solid #3498db;
+      border-radius: 5px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+      box-sizing: border-box;
+    }
+    button {
+      margin: 10px auto;
+      display: block;
+      padding: 10px;
+      background-color: #3498db;
+      color: #fff;
+      border: 2px solid #3498db;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+      box-sizing: border-box;
+    }
+button:hover {
+background-color: #ff6600 !important;
+}
+    #menuButton {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      padding: 10px;
+      background-color: #3498db;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px auto;
+      display: block;
+      padding: 10px;
+      background-color: #3498db;
+      color: #fff;
+      border: 2px solid #3498db;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+      box-sizing: border-box;
+    }
+#menuButton:hover {
+    background-color: #e67e22;
+}
+
+    table {
+      border-collapse: collapse;
+      width: 80%;
+      margin: 20px auto;
+    }
+    th, td {
+      border: 1px solid #dddddd;
+      text-align: center;
+      padding: 8px;
+    }
+    .missing-decklist-box {
+      display: flex;
+      justify-content: center;
+      margin: 20px;
+    }
+    .missing-decklist-list {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .missing-decklist-list li {
+      margin: 5px;
+    }
+    .missing-decklist-item {
+      padding: 1px;
+      border: 2px solid #e74c3c; /* Couleur rouge */
+      border-radius: 5px;
+      background-color: #ffe4e1; /* Fond légèrement en relief */
+      text-align: right;
+    }
+   .missing-decklist-item input:checked + label {
+  color: green !important; /* Changer la couleur du texte en noir lorsque la case est cochée */
+  border: 2px solid #2ecc71 !important; /* Couleur verte pour la bordure */
+  border-radius: 5px;
+  background-color: #d5f5e3 !important; /* Fond vert clair */
+  text-align: right;
+  text-decoration: line-through; /* Ajouter la ligne barrée */
+}
+
+.missing-decklist-item input:checked {
+  border: 2px solid #2ecc71 !important; /* Couleur verte pour la bordure */
+  background-color: #d5f5e3 !important; /* Fond vert clair */
+}
+    .result-box {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .result-item {
+      margin: 5px;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      text-align: center;
+    }
+    .result-item:hover {
+      background-color: #f9f9f9;
+    }
+    .result-item input {
+      margin-right: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Decklist Verification</h1>
+  <i>Paste the raw tournament data into the text boxes below, then click on "Run code" to display the results.</i>
+  <br><br>
+
+  <!-- Utilisation de la classe "textbox-container" pour aligner les textareas -->
+  <div class="textbox-container">
+ <textarea id="playerList" rows="10" cols="50" placeholder="Players in the tournament" style="font-size: 16px;"></textarea>
+<textarea id="deckList" rows="10" cols="50" placeholder="Players with a decklist" style="font-size: 16px;"></textarea>
+
+  </div>
+
+  <!-- Ajout d'une nouvelle div pour afficher les résultats -->
+  <div id="resultsSection"></div>
+
+  <!-- Ajout d'une nouvelle div pour afficher le message -->
+  <div id="executionMessage"></div>
+
+  <button onclick="executerCode()">Execute Code</button>
+  <button id="menuButton" class="menuButton" onclick="goToMenu()">Menu</button>
+
+  <script>
+    function normaliserNom(nom) {
+      return nom.toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Élimine les accents
+        .replace(/[\W_]+/g, ""); // Élimine les caractères spéciaux et les espaces multiples
+    }
+
+    function capitalizeWords(str) {
+      // Cette fonction met une majuscule au début de chaque mot dans une chaîne
+      return str.replace(/\b\w/g, function (match) {
+        return match.toUpperCase();
+      });
+    }
+
+    function goToMenu() {
+      window.location.href = "menu.html";
+    }
+
+    document.getElementById('menuButton').addEventListener('click', goToMenu);
+
+    function executerCode() {
+  var playerListData = document.getElementById("playerList").value;
+  var deckListData = document.getElementById("deckList").value;
+
+  console.log("Données de la liste des joueurs :");
+  console.log(playerListData);
+
+  console.log("Données de la liste des decks :");
+  console.log(deckListData);
+
+  console.log("Avant regroupement par liste");
+  var playerListResults = regrouperParListe(playerListData);
+  console.log("Après regroupement par liste");
+
+  console.log("Avant regroupement par liste pour les decks");
+  var deckListResults = regrouperParListe(deckListData);
+  console.log("Après regroupement par liste pour les decks");
+
+  console.log("Résultats de la liste des joueurs :");
+  console.log(playerListResults);
+
+  console.log("Résultats de la liste des decks :");
+  console.log(deckListResults);
+
+var playerListResults = regrouperParListe(playerListData);
+var deckListResults = regrouperParListe(deckListData);
+var missingDecklist = comparerListes(playerListResults, deckListResults);
+afficherDecompte(missingDecklist);
+
+console.log("Joueurs sans liste de deck :");
+console.log(missingDecklist);
+
+// Mise à jour du décompte après l'affichage des résultats
+majResultats(missingDecklist, "resultsSection");
+// Ajout du message après l'exécution du code
+afficherMessage("Le code a été exécuté avec succès.");
+
+// Mise à jour du décompte après la mise à jour des decklists manquantes
+
+}
+    function afficherMessage(message) {
+      var messageElement = document.getElementById("executionMessage");
+      messageElement.textContent = message;
+    }
+
+    function capitalizeWords(str) {
+      // Cette fonction met une majuscule au début de chaque mot dans une chaîne
+      return str.replace(/\b\w/g, function (match) {
+        return match.toUpperCase();
+      });
+    }
+
+    function majResultats(resultData, elementId) {
+      var element = document.getElementById(elementId);
+      element.innerHTML = ""; // Effacer le contenu actuel
+
+      if (resultData && resultData.length > 0) {
+        var resultList = document.createElement("ul");
+        resultList.classList.add("missing-decklist-list");
+
+        // Utilisation d'un ensemble pour éliminer les doublons
+        var uniqueResults = [...new Set(resultData)];
+
+        // Création de colonnes supplémentaires si nécessaire
+        var numberOfColumns = 2; // Vous pouvez ajuster le nombre de colonnes souhaité
+        var columnSize = Math.ceil(uniqueResults.length / numberOfColumns);
+
+        for (var i = 0; i < numberOfColumns; i++) {
+          var columnList = document.createElement("ul");
+
+          for (var j = i * columnSize; j < (i + 1) * columnSize && j < uniqueResults.length; j++) {
+            var listItem = document.createElement("li");
+
+            // Créer une case à cocher pour chaque nom
+            var checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.id = "checkbox_" + j;
+            checkbox.addEventListener("change", function () {
+              // Appliquer ou retirer le style de barré lorsqu'une case à cocher est cochée/décochée
+              var label = document.querySelector("label[for='" + this.id + "']");
+              if (this.checked) {
+                label.style.textDecoration = "line-through";
+              } else {
+                label.style.textDecoration = "none";
+              }
+              majDecompte(getDecklistsManquantesCount());
+            });
+
+            // Créer une étiquette pour le nom
+            var label = document.createElement("label");
+            label.htmlFor = "checkbox_" + j;
+
+            // Mettre une majuscule au début de chaque mot dans le nom
+            label.textContent = capitalizeWords(uniqueResults[j]);
+
+            // Ajouter la classe pour le style personnalisé
+            listItem.classList.add("missing-decklist-item");
+
+            // Ajouter la case à cocher et l'étiquette à l'élément de la liste
+            listItem.appendChild(checkbox);
+            listItem.appendChild(label);
+
+            // Ajouter l'élément de la liste à la colonne
+            columnList.appendChild(listItem);
+          }
+
+          // Ajouter la colonne à la liste principale
+          resultList.appendChild(columnList);
+        }
+
+        // Ajouter la liste à la boîte de résultats
+        var resultBox = document.createElement("div");
+        resultBox.classList.add("missing-decklist-box");
+        resultBox.appendChild(resultList);
+
+        // Ajouter la boîte de résultats à l'élément cible
+        element.appendChild(resultBox);
+
+        // Mettre à jour le décompte après l'affichage initial
+        majDecompte(missingDecklist.length);
+      } else {
+        element.textContent = "All players have sent in their deck lists.";
+        // Mettre à jour le décompte lorsque toutes les decklists sont présentes
+        majDecompte(0);
+      }
+    }
+
+    function majDecompte() {
+  var decompteElement = document.getElementById("decklistCount");
+
+  if (!decompteElement) {
+    decompteElement = document.createElement("div");
+    decompteElement.id = "decklistCount";
+    document.body.insertBefore(decompteElement, document.getElementById("resultsSection").nextSibling);
+  }
+
+  var checkboxes = document.querySelectorAll(".missing-decklist-item input[type='checkbox']");
+  var checkedCount = Array.from(checkboxes).filter(checkbox => checkbox.checked).length;
+
+  var totalMissingDecklists = missingDecklist.length;
+  var remainingMissingDecklists = totalMissingDecklists - checkedCount;
+
+  decompteElement.textContent = "Missing decklists identified : " + remainingMissingDecklists;
+}
+    function afficherDecompte(missingDecklist) {
+  var decompteElement = document.getElementById("decklistCount");
+
+  if (!decompteElement) {
+    decompteElement = document.createElement("div");
+    decompteElement.id = "decklistCount";
+    document.body.insertBefore(decompteElement, document.getElementById("resultsSection").nextSibling);
+  }
+
+  var count = missingDecklist.length;
+
+  decompteElement.textContent = "Missing decklists identified : " + count;
+}
+
+    function normaliserNom(nom) {
+      // Normaliser le nom en mettant tout en minuscules et en éliminant les accents et caractères spéciaux
+      return nom.toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[\W_]+/g, "");
+    }
+
+    function regrouperParListe(data) {
+      var lines = data.split("\n");
+      var resultList = [];
+
+      for (var i = 0; i < lines.length; i++) {
+        var line = lines[i].trim();
+
+        if (line !== "") {
+          resultList.push(normaliserNom(line));
+        }
+      }
+
+      return resultList;
+    }
+
+    function comparerListes(liste1, liste2) {
+      if (!liste1 || !liste2) {
+        return [];
+      }
+
+      // Normaliser les noms dans chaque liste avant de comparer
+      var normalisedListe1 = liste1.map(normaliserNom);
+      var normalisedListe2 = liste2.map(normaliserNom);
+
+      var missingDecklist = normalisedListe1.filter(function (item) {
+        return normalisedListe2.indexOf(item) === -1;
+      });
+
+      return missingDecklist;
+    }
+
+    function getDecklistsManquantesCount() {
+  // Récupérer le nombre de decklists manquantes en comptant les cases à cocher cochées
+  var checkboxes = document.querySelectorAll(".missing-decklist-item input[type='checkbox']:checked");
+  return checkboxes.length;
+}
+function afficherDecompte(missingDecklist) {
+  var decompteElement = document.getElementById("decklistCount");
+
+  if (!decompteElement) {
+    decompteElement = document.createElement("div");
+    decompteElement.id = "decklistCount";
+    document.body.insertBefore(decompteElement, document.getElementById("resultsSection").nextSibling);
+  }
+
+  var count = missingDecklist.length;
+
+  decompteElement.textContent = "Missing decklists identified : " + count;
+}
+function changerCouleurBox(id, isChecked) {
+  var box = document.getElementById("checkbox_" + id).parentNode;
+  
+  if (isChecked) {
+    box.style.borderColor = "#2ecc71";  // Couleur verte
+    box.style.backgroundColor = "#2ecc71";  // Fond vert clair
+    box.style.color = "#ffffff";  // Texte en blanc
+  } else {
+    box.style.borderColor = "#e74c3c";  // Couleur rouge
+    box.style.backgroundColor = "#ffe4e1";  // Fond rouge clair
+    box.style.color = "#000000";  // Texte en noir
+  }
+}
+checkbox.addEventListener("change", function () {
+  changerCouleurBox(j, this.checked);
+  majDecompte(getDecklistsManquantesCount());
+});
+
+
+  </script>
+
+  <footer>
+    All rights reserved. Site web by <a href="mailto:info@timevaulttcg.com">Jordane Lacombe</a>
+  </footer>
+</body>
+</html>

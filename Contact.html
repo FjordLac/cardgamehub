@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events&Tournaments</title>
+    <style>
+        body {
+            font-family: times;
+            margin: 0px;
+            padding: 0;  
+            opacity: 1; /* Transparence */
+        }
+
+        header {
+            background-color: #3498db;
+            color: #fff;
+            padding: 25px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2em; /* Taille du texte pour le nom du site */
+            margin: 0; /* Supprimer la marge par défaut */
+        }
+
+        h3 {
+            font-size: 1em; /* Taille du texte pour le slogan */
+            margin: 5px 0; /* Marge en haut et en bas du slogan */
+        }
+
+        nav {
+            background-color: #f3f3f3;
+            overflow: hidden;
+        }
+
+        nav a {
+            float: left;
+            display: block;
+            color: black;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-weight: bold; /* Texte en gras */
+        }
+
+        
+        .buttonborder {
+            border: 2px solid #3498db;
+            /* Ajout de la bordure en bleu foncé */
+            border-radius: 5px;
+            /* Ajout d'arrondis aux coins */
+            background-color: #3498db;
+            /* Couleur de fond */
+            color: white;
+            /* Couleur du texte */
+
+        }
+
+button {
+    margin: 10px auto; /* Centrer le bouton horizontalement */
+    display: block;
+    padding: 10px;
+    background-color: #3498db;
+    color: #fff;
+    border: 2px solid #3498db; /* Ajouter une bordure */
+    border-radius: 5px; /* Ajouter des coins arrondis */
+    cursor: pointer;
+    font-size: 16px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2); /* Ajouter une ombre */
+    box-sizing: border-box; /* Inclure la bordure et le rembourrage dans la largeur totale */
+     /* Ajouter une transition pour le changement de couleur */
+}
+
+        nav a:hover {
+            background-color: #ddd;
+            color: darkblue;
+			border: 2px solid darkBlue;
+			border-radius: 5px;
+        }
+
+        section {
+            padding: 20px;
+            color: #333; /* Couleur du texte, ajustez selon vos besoins */
+        }
+
+        .event-section {
+            padding: 20px;
+            background-color: #f8f8f8; /* Couleur de fond */
+            border-radius: 10px; /* Coins arrondis */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombre légère */
+            margin-top: 0px;
+        }
+
+        .event-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .event-list-item {
+            margin-bottom: 10px;
+        }
+
+        .event-link {
+            color: #3498db; /* Couleur du lien */
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease; /* Transition de couleur sur hover */
+        }
+
+        .event-link:hover { /* Variation de couleur sur hover */
+            color: #ff6600; /* Orange flashy */
+            font-weight: bold;
+        }
+
+       footer {
+    background-color: transparent;
+    color: #bbb;
+    text-align: center;
+    padding: 5px;
+    font-weight: light;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+}
+
+        form {
+            margin-top: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+
+        }
+
+        button:hover {
+
+    background-color: #ff6600 !important; /* Ajout de !important pour assurer la prévalence */
+
+
+}
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>EVENTS & TOURNAMENTS</h1>
+        <h3>Shaping the conception of your event</h3>
+    </header>
+
+    <nav>
+        <a href="menu.html" >Menu</a>
+        <a href="staffing.html">Staffing</a>
+        <a href="tools.html" >Tools</a>
+        <a href="contact.html" class="buttonborder">Contact</a>
+    </nav>
+
+       <!-- Formulaire de contact -->
+    <section>
+
+<section style="position: relative; z-index: 1;">
+    <h2 style="margin-bottom: 20px;">Contact Us</h2>
+   <form action="process_form.php" method="post" style="background-color: #f8f8f8; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required style="width: 100%; padding: 8px; margin-bottom: 16px; box-sizing: border-box;">
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required style="width: 100%; padding: 8px; margin-bottom: 16px; box-sizing: border-box;">
+
+        <label for="subject">Subject:</label>
+        <input type="text" id="subject" name="subject" required style="width: 100%; padding: 8px; margin-bottom: 16px; box-sizing: border-box;">
+
+        <label for="message">Message:</label>
+        <textarea id="message" name="message" rows="4" required style="width: 100%; padding: 8px; margin-bottom: 16px; box-sizing: border-box;"></textarea>
+
+        <button type="submit" style="background-color: #3498db; color: #fff; padding: 10px 20px; border: 2px solid #3498db; cursor: pointer; font-size: 16px; font-weight: bold;">Submit</button>
+
+
+</form>
+
+
+    </form>
+</section>
+ <footer>
+            All rights reserved. Site web by <a href="mailto:info@timevaulttcg.com">Jordane Lacombe</a>
+        </footer>
+</body>
+</html>
