@@ -1,1 +1,208 @@
-https://fjordlac.github.io/cardgamehub/Menu.html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tables Interactives</title>
+    <style>
+        :root {
+            --table-width: 50px;
+            --table-height: 70px;
+            --table-background: gray;
+            --table-border: 2px solid #ccc;
+            --table-radius: 8px;
+            --table-box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        main {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .table-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .table {
+            width: var(--table-width);
+            height: var(--table-height);
+            background-color: var(--table-background);
+            border: var(--table-border);
+            border-radius: var(--table-radius);
+            box-shadow: var(--table-box-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            position: relative;
+
+        }
+
+        .table-text {
+            position: absolute;
+            bottom: 0px;
+            font-size: 10px;
+        }
+
+        .table.red {
+            background-color: red;
+            color: white;
+        }
+
+        .table.yellow {
+            background-color: yellow;
+            color: black;
+        }
+
+        .table.green {
+            background-color: green;
+            color: white;
+            text-decoration: line-through;
+        }
+
+        .table-container {
+            margin-top: 10px;
+        }
+
+        input {
+            width: 30px;
+            text-align: center;
+        }
+
+        button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        #chrono {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main>
+        <h1>Tables Interactives</h1>
+
+        <div id="chrono">Chrono: <input type="number" id="chronoInput" min="1" value="50"> minutes</div>
+
+        <label for="firstTableInput">Table number:</label>
+        <input type="number" id="firstTableInput" min="1" max="100" value="1">
+        à
+        <input type="number" id="lastTableInput" min="1" max="100" value="1">
+        <button onclick="changeTableCount()">Generate Tables</button>
+
+        <div id="tablesContainer" class="table-container"></div>
+        <button onclick="changeTableText()">Modifier Temps</button>
+    </main>
+
+    <script>
+        let firstTable, lastTable;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            firstTable = 1;
+            lastTable = 20;
+
+            document.getElementById("firstTableInput").value = firstTable;
+            document.getElementById("lastTableInput").value = lastTable;
+
+            createTables();
+        });
+
+        function changeTableCount() {
+            firstTable = parseInt(document.getElementById("firstTableInput").value);
+            lastTable = parseInt(document.getElementById("lastTableInput").value);
+
+            if (lastTable < firstTable) {
+                alert("Le dernier Table ne peut pas être inférieur au premier Table.");
+                document.getElementById("lastTableInput").value = firstTable;
+                return;
+            }
+
+            createTables();
+        }
+
+        function createTables() {
+            const tablesContainer = document.getElementById("tablesContainer");
+            tablesContainer.innerHTML = "";
+
+            for (let i = firstTable; i <= lastTable; i++) {
+                const table = createTableElement(i);
+                tablesContainer.appendChild(table);
+            }
+        }
+
+        function createTableElement(tableNumber) {
+            const table = document.createElement("div");
+            table.className = "table";
+            table.textContent = tableNumber;
+            table.setAttribute("data-number", tableNumber);
+
+            const tableText = document.createElement("div");
+            tableText.className = "table-text";
+            tableText.textContent = "Tps";
+
+            table.appendChild(tableText);
+
+            table.addEventListener("click", toggleTableColor);
+            table.addEventListener("contextmenu", function (event) {
+                event.preventDefault();
+                changeTableText(tableNumber);
+            });
+
+            return table;
+        }
+
+        function toggleTableColor(event) {
+            const table = event.target;
+
+            if (table.classList.contains("red")) {
+                setTableColor(table, "yellow", "black");
+            } else if (table.classList.contains("yellow")) {
+                setTableColor(table, "green", "white", "line-through");
+            } else if (table.classList.contains("green")) {
+                setTableColor(table, "gray", "initial", "none");
+            } else {
+                setTableColor(table, "red", "white");
+            }
+        }
+
+        function setTableColor(table, backgroundColor, color, textDecoration = "none") {
+            table.style.backgroundColor = backgroundColor;
+            table.style.color = color;
+            table.style.textDecoration = textDecoration;
+            table.classList.remove("red", "yellow", "green");
+            table.classList.add(backgroundColor);
+        }
+
+        function changeTableText(tableNumber) {
+            const newText = prompt("Texte additionnel :");
+
+            if (newText) {
+                const table = document.querySelector(`.table[data-number="${tableNumber}"]`);
+
+                if (table) {
+                    const tableText = table.querySelector(".table-text");
+                    tableText.textContent = newText;
+                } else {
+                    alert("Numéro de table invalide.");
+                }
+            }
+        }
+    </script>
+
+</body>
+
+</html>
